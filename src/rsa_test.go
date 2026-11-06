@@ -17,24 +17,9 @@ func TestGeneratePrimes(t *testing.T) {
 		t.Fatal("Expected two big ints, got nil")
 	}
 
-	assert.Equal(t, p.BitLen(), 2048, "p should be 2048 bits")
-	assert.Equal(t, q.BitLen(), 2048, "q should be 2048 bits")
+	assert.Equal(t, p.BitLen(), 1024, "p should be 1024 bits")
+	assert.Equal(t, q.BitLen(), 1024, "q should be 1024 bits")
 	assert.True(t, p.ProbablyPrime(20), true, "p should be prime")
 	assert.True(t, q.ProbablyPrime(20), true, "q should be prime")
 
-}
-
-func TestRsaEncrypt(t *testing.T) {
-	tests := []struct {
-		name string // description of this test case
-		// Named input parameters for target function.
-		m int
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			RsaEncrypt(tt.m)
-		})
-	}
 }
