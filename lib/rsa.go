@@ -22,6 +22,7 @@ type PrivateKey struct {
 }
 
 func GeneratePrimes() (*big.Int, *big.Int, error) {
+	// Secure RSA requires a 2048 bit prime number combination
 	p, err := rand.Prime(rand.Reader, 1024)
 	if err != nil {
 		return nil, nil, err
@@ -96,11 +97,11 @@ func GenerateKeys() (*PublicKey, *PrivateKey, error) {
 
 	n := new(big.Int).Mul(p, q)
 
-	lambda := Carmichael(p, q)
+	lambda := Carmichael(p, q) // Carmicheal's totient function to discern λ
 
 	e := big.NewInt(65537)
 
-	if GCD(e, lambda).Cmp(big.NewInt(1)) != 0 {
+	if GCD(e, lambda).Cmp(big.NewInt(1)) != 0 { // λ and e must be coprime
 		return nil, nil, errors.New("invalid exponent")
 	}
 
