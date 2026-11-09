@@ -65,37 +65,21 @@ func Carmichael(p, q *big.Int) *big.Int {
 	return LCM(pm1, qm1)
 }
 
-func Mgf1(seed []byte, length uint64) ([]byte, error) {
-	// 137438953472 is 32 << 32, blake3 hashes have a length of 32
-	if (length > uint64(137438953472)) || (length == 0) {
-		return nil, errors.New("mask is of incorrect length")
-	}
-
-	T := make([]byte, 0, length)
-
-	var iterations uint32 = 0
-	var C [4]byte
-
-	// Until the number of bytes needed have been appended
-	for len(T) < int(length) {
-		binary.BigEndian.PutUint32(C[:], iterations)
-		h := blake3.New(32, nil)
-		_, _ = h.Write(seed) // Discard unlikely return values (underscores)
-		_, _ = h.Write(C[:])
-		T = append(T, h.Sum(nil)...) // Outputs to open buffer
-		iterations++
-	}
-
-	return T[:length], nil // Returns the first bytes of length or error
-}
-
 func GenerateKeys() (*PublicKey, *PrivateKey, error) {
 	p, q, err := GeneratePrimes()
 	if err != nil {
 		return nil, nil, err
 	}
-
 	n := new(big.Int).Mul(p, q)
+
+	for n.BitLen() != 2048 {
+		p, q, err := GeneratePrimes()
+		if err != nil {
+			return nil, nil, err
+		}
+		n := new(big.Int).Mul(p, q)
+		n.BitLen() // Here to avoid go saying declared and not used for n
+	}
 
 	lambda := Carmichael(p, q) // Carmicheal's totient function to discern λ
 
@@ -123,6 +107,30 @@ func GenerateKeys() (*PublicKey, *PrivateKey, error) {
 	}
 
 	return publicKey, privateKey, nil
+}
+
+func Mgf1(seed []byte, length uint64) ([]byte, error) {
+	// 137438953472 is 32 << 32, blake3 hashes have a length of 32
+	if (length > uint64(137438953472)) || (length == 0) {
+		return nil, errors.New("mask is of incorrect length")
+	}
+
+	T := make([]byte, 0, length)
+
+	var iterations uint32 = 0
+	var C [4]byte
+
+	// Until the number of bytes needed have been appended
+	for len(T) < int(length) {
+		binary.BigEndian.PutUint32(C[:], iterations)
+		h := blake3.New(32, nil)
+		_, _ = h.Write(seed) // Discard unlikely return values (underscores)
+		_, _ = h.Write(C[:])
+		T = append(T, h.Sum(nil)...) // Outputs to open buffer
+		iterations++
+	}
+
+	return T[:length], nil // Returns the first bytes of length or error
 }
 
 func Encrypt(message, e, n *big.Int) (*big.Int, error) {
