@@ -74,12 +74,12 @@ func GenerateKeys() (*PublicKey, *PrivateKey, error) {
 	e := big.NewInt(65537)
 
 	if GCD(e, lambda).Cmp(big.NewInt(1)) != 0 {
-		return nil, nil, errors.New("Invalid exponent")
+		return nil, nil, errors.New("invalid exponent")
 	}
 
 	d := new(big.Int).ModInverse(e, lambda)
 	if d == nil {
-		return nil, nil, errors.New("Modular inverse does not exist")
+		return nil, nil, errors.New("modular inverse does not exist")
 	}
 
 	publicKey := &PublicKey{
@@ -99,7 +99,7 @@ func GenerateKeys() (*PublicKey, *PrivateKey, error) {
 
 func Encrypt(message, e, n *big.Int) (*big.Int, error) {
 	if message.Sign() < 0 || message.Cmp(n) >= 0 {
-		return nil, errors.New("Message must be between 0 and n-1")
+		return nil, errors.New("message must be between 0 and n-1")
 	}
 
 	return new(big.Int).Exp(message, e, n), nil
@@ -107,7 +107,7 @@ func Encrypt(message, e, n *big.Int) (*big.Int, error) {
 
 func Decrypt(ciphertext, d, n *big.Int) (*big.Int, error) {
 	if ciphertext.Sign() < 0 || ciphertext.Cmp(n) >= 0 {
-		return nil, errors.New("Ciphertext must be between 0 and n-1")
+		return nil, errors.New("ciphertext must be between 0 and n-1")
 	}
 
 	return new(big.Int).Exp(ciphertext, d, n), nil
