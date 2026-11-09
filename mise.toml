@@ -1,0 +1,15 @@
+[tools]
+go = "1.27.3"
+golangci-lint = "v2.15.0"
+
+[tasks.test]
+description = "Runs test suite"
+run = "go test -C ./lib/"
+
+[tasks.fmt]
+description = "Formats go.mod and go source files"
+run = ["go mod tidy", "go fmt ./lib/"]
+
+[tasks.lint]
+description = "Lints go source files"
+run = "golangci-lint run ./lib/"

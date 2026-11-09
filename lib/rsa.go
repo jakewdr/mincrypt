@@ -1,4 +1,4 @@
-package mincrypt
+package lib
 
 import (
 	"crypto/rand"
